@@ -1,0 +1,1 @@
+#define SIMPLEUI_VERSION_STRING "v0.3.0"
