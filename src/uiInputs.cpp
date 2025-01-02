@@ -176,22 +176,22 @@ void uiIntValueInput::drawThis(frameInfo* f){
 }
 
 void uiIntValueInput::react(UserAction UA){
-    S_log("react",id);
+    UI_DEBUG("react",id);
     int cid = -2;
     switch(focus){
         case FocusState::current:
             //we handle it
-            S_log("i have to react",id);
+            UI_DEBUG("i have to react",id);
             switch (UA){
                 case UserAction::backButton:
-                    S_log("back pressed",id);
+                    UI_DEBUG("back pressed",id);
                     //the focus shifts back to parent
                     if(parent != nullptr){
                         focus = FocusState::parent;
-                         S_log("back to parent",id);
+                         UI_DEBUG("back to parent",id);
                         selectFocusReceiverMethod(parent);
                     }else{
-                            Slog("err: element is orphan! (has no parent)");
+                            UI_ERROR("err: element is orphan! (has no parent)",id);
                         }
                     break;
                 case UserAction::rightButton:{
@@ -217,14 +217,14 @@ void uiIntValueInput::react(UserAction UA){
                     break;
                 }
                 default:
-                    S_log("default",id);
+                    UI_DEBUG("default",id);
                     SafeCallback(onUnassignedInput,onUnassignedInput(this,getUIEventTypeFromUserAction(UA)));
                     break;
             }
             break;
         default:
             //this should not happen
-            S_log("err: reacted but Parent has focus!",id)
+            UI_ERROR("err: reacted but Parent has focus!",id)
             break;
     };
 };

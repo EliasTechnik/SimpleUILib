@@ -165,13 +165,13 @@ void uiHardwareInputDriver::run(){
                 root->react(input->getLongpressAction());
                 SafeCallback(onReact,onReact(nullptr));
                 input->satisfyLongpressRequest();
-                Slog("longpress");
+                UI_DEBUG("longpress","HID");
             }else{
                 //shortpress
                 root->react(input->getAction());
                 SafeCallback(onReact,onReact(nullptr));
                 input->satisfyRequest();
-                Slog("shortpress");
+                UI_DEBUG("shortpress","HID");
             }
             
         }
@@ -179,7 +179,7 @@ void uiHardwareInputDriver::run(){
             root->react(input->getAction());
             SafeCallback(onReact,onReact(nullptr));
             input->satisfyAutopressRequest();
-            Slog("autopress");
+            UI_DEBUG("autopress","HID");
         }
     }
 }

@@ -20,7 +20,7 @@ uiRadio::uiRadio(Position _position, string _text, bool _checked, uiEventCallbac
 }
 
 void uiRadio::receiveFocus(uiElement* sender){
-    S_log("bounce focus",id)
+    UI_DEBUG("bounce focus",id)
     sender->receiveFocus(this);
     checked = !checked;
     SafeCallback(onRcvFocus, onRcvFocus(this, UIEventType::UIET_onChange))

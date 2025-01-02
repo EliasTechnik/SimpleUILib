@@ -30,11 +30,11 @@ bool uiElement::getVisible(){
 };
 
 bool uiElement::setSelected(SelectionState isSelected){ 
-    S_log("selection update",id);
+    UI_DEBUG("selection update",id);
     bool succes = false;
     switch(focusMode){
         case FocusMode::target:
-            S_log("warn: This element uses target focus but got an selectionState update. This might be an error?",id);
+            UI_WARNING("warn: This element uses target focus but got an selectionState update. This might be an error?",id);
             switch(selectionMode){
                 case SelectionMode::selectable:
                     selected = isSelected;
@@ -64,12 +64,15 @@ bool uiElement::setSelected(SelectionState isSelected){
             }
         break;
         case FocusMode::collection:
+            UI_DEBUG("FocusMode::collection",id)
             switch(selectionMode){
                 case SelectionMode::selectable:
+                    UI_DEBUG("SelectionMode::selectable",id)
                     selected = isSelected;
                     return true;
                 break;
                 case SelectionMode::passthroughSelection:
+                    UI_DEBUG("SelectionMode::passthroughtSelection",id)
                     if(childs.size()>0){
                         for(unsigned int i = 0;childs.size()-1; i++){
                             succes = childs.at(i)->setSelected(isSelected) && true;
@@ -78,6 +81,7 @@ bool uiElement::setSelected(SelectionState isSelected){
                     }
                 break;
                 case SelectionMode::forwardSelection:
+                    UI_DEBUG("SelectionMode::forwardSelection",id)
                     selected = isSelected;
                     if(childs.size()>0){
                         for(unsigned int i = 0;childs.size()-1; i++){
@@ -87,28 +91,31 @@ bool uiElement::setSelected(SelectionState isSelected){
                     return true;
                 break;
                 case SelectionMode::notSelectable:
+                    UI_DEBUG("SelectionMode::notSelectable",id)
                     selected = SelectionState::notSelected;
                     return false;
                 break;
             }
         break;
         case FocusMode::passthrough:
+            UI_DEBUG("FocusMode::passthrough",id)
             if(focusChild != nullptr){
                 return focusChild->setSelected(isSelected);
             }else{
-                S_log("err: no focusChild to pass selection through.",id)
+                UI_ERROR("err: no focusChild to pass selection through.",id)
                 return false;
             }
         break;
         case FocusMode::passive:
+        UI_DEBUG("FocusMode::passive",id)
             switch(selectionMode){
                 case SelectionMode::selectable:
                     selected = isSelected;
-                    S_log("warn: This element cant receive focus but got an selectionState update. This might be an error.",id)
+                    UI_WARNING("warn: This element cant receive focus but got an selectionState update. This might be an error.",id)
                     return true;
                 break;
                 case SelectionMode::passthroughSelection:
-                    S_log("warn: This element cant receive focus but got an selectionState update. This might be an error.",id)
+                    UI_WARNING("warn: This element cant receive focus but got an selectionState update. This might be an error.",id)
                     if(childs.size()>0){
                         for(unsigned int i = 0;childs.size()-1; i++){
                             succes = childs.at(i)->setSelected(isSelected) && true;
@@ -117,7 +124,7 @@ bool uiElement::setSelected(SelectionState isSelected){
                     }
                 break;
                 case SelectionMode::forwardSelection:
-                    S_log("warn: This element cant receive focus but got an selectionState update. This might be an error.",id)
+                    UI_WARNING("warn: This element cant receive focus but got an selectionState update. This might be an error.",id)
                     selected = isSelected;
                     if(childs.size()>0){
                         for(unsigned int i = 0;childs.size()-1; i++){
@@ -133,16 +140,16 @@ bool uiElement::setSelected(SelectionState isSelected){
             }
         break;
     }
-    S_log("err: control reached end of function but is not supposed to!",id)
+    UI_ERROR("err: control reached end of function but is not supposed to!",id)
     return false;
 };
 
 bool uiElement::getSelectable(){
     if(selectionMode == SelectionMode::notSelectable){
-        Slog("notSelectable")
+        UI_DEBUG("notSelectable",id)
         return false;
     }else{
-        Slog("selectable")
+        UI_DEBUG("selectable",id)
         return true;
     }
 };
@@ -176,21 +183,21 @@ void uiElement::setID(String _id){
 }
 
 void uiElement::react(UserAction UA){
-    S_log("react",id);
+    UI_DEBUG("react",id);
     int cid = -2;
     switch(focus){
         case FocusState::child:
             //we hand it down
             if(childWithFocus != nullptr){
-                S_log("hand down",id);
+                UI_DEBUG("hand down",id);
                 childWithFocus->react(UA);
             }else{
-                S_log("err: FocusState is child but no child with focus registered exists!", id);
+                UI_ERROR("err: FocusState is child but no child with focus registered exists!", id);
             }
             break;
         case FocusState::current:
             //we handle it
-            S_log("i have to react",id);
+            UI_DEBUG("i have to react",id);
             switch (UA){
                 case UserAction::backButton:
                     //the focus shifts back to parent
@@ -203,7 +210,7 @@ void uiElement::react(UserAction UA){
                                 childs.at(selectedChildID)->setSelected(SelectionState::notSelected);
                             }
                         }else{
-                            Slog("err: element is orphan! (has no parent)");
+                            UI_ERROR("err: element is orphan! (has no parent)",id);
                         }
                         
                         //onLeave()
@@ -212,18 +219,18 @@ void uiElement::react(UserAction UA){
                 case UserAction::enterButton:
                     if(focusMode == FocusMode::collection){
                         //onEnter()
-                        S_log("Enter pressed. TODO: Callback",id)
+                        UI_DEBUG("Enter pressed. TODO: Callback",id)
                     }else{
                         if(focusMode == FocusMode::target){
                             //child gets focus
                             if(selectedChildID != -1){
-                                S_log("enter. push focus to child",id)
+                                UI_DEBUG("enter. push focus to child",id)
                                 childWithFocus = childs.at(selectedChildID);
                                 focus = FocusState::child;
                                 childWithFocus->setSelected(SelectionState::notSelected); //remove selection. this is now the problem of the child
                                 childWithFocus->receiveFocus(this);
                             }else{
-                                Slog("err: No child selected. TODO?"); 
+                                UI_ERROR("err: No child selected. TODO?",id); 
                                 SafeCallback(onUnassignedInput, onUnassignedInput(this, UIET_onEnter));
                             }
                         }
@@ -232,11 +239,11 @@ void uiElement::react(UserAction UA){
                 case UserAction::leftButton:{
                     //previous child gets selected 
                     if(focusMode == FocusMode::target){
-                        S_log("left: sel priv child",id)
+                        UI_DEBUG("left: sel priv child",id)
                         cid = getPriviousSelectableChildID();
 
                         if(cid == -1){
-                            Slog("err: No selectable child found.")
+                            UI_ERROR("err: No selectable child found.",id)
                         }else{
                             //remove selection from old child
                             childs.at(selectedChildID)->setSelected(SelectionState::notSelected);
@@ -244,7 +251,7 @@ void uiElement::react(UserAction UA){
                             childs.at(selectedChildID)->setSelected(SelectionState::showAsSelected);
                         }
                     }else{
-                        S_log("Left pressed. Callback",id)
+                        UI_DEBUG("Left pressed. Callback",id)
                         SafeCallback(onUnassignedInput, onUnassignedInput(this, UIET_onLeft));
                         
                     }
@@ -253,11 +260,11 @@ void uiElement::react(UserAction UA){
                 case UserAction::rightButton:{
                     //next child gets selected 
                     if(focusMode == FocusMode::target){
-                        S_log("right: sel next child",id)
+                        UI_DEBUG("right: sel next child",id)
                         cid = getNextSelectableChildID();
 
                         if(cid == -1){
-                            Slog("err: No selectable child found.")
+                            UI_ERROR("err: No selectable child found.",id)
                         }else{
                             //remove selection from old child
                             childs.at(selectedChildID)->setSelected(SelectionState::notSelected);
@@ -265,7 +272,7 @@ void uiElement::react(UserAction UA){
                             childs.at(selectedChildID)->setSelected(SelectionState::showAsSelected);
                         }
                     }else{
-                         S_log("Right pressed. Callback",id)
+                         UI_DEBUG("Right pressed. Callback",id)
                          if(onUnassignedInput != nullptr){
                             onUnassignedInput(this, UIET_onRight);
                         }
@@ -279,7 +286,7 @@ void uiElement::react(UserAction UA){
             break;
         default:
             //this should not happen
-            S_log("err: reacted but Parent has focus!",id)
+            UI_ERROR("err: reacted but Parent has focus!",id)
             break;
     };
 };
@@ -293,7 +300,7 @@ void uiElement::selectFocusReceiverMethod(uiElement* receiver){
         if(page != nullptr){
             page->receiveFocus(this);
         }else{
-            S_log("err: Cast to page failed.",id);
+            UI_ERROR("err: Cast to page failed.",id);
         }
     }else{
         receiver->receiveFocus(this);   
@@ -303,27 +310,33 @@ void uiElement::selectFocusReceiverMethod(uiElement* receiver){
 void uiElement::setChildSelection(bool ignoreFocusChild){
     //set selection
     if(ignoreFocusChild){
-        if(selectedChildID<childs.size()){
+        UI_DEBUG("ignoring focus child",id)
+        if(selectedChildID<childs.size() && selectedChildID>=0){
             if(childs.at(selectedChildID)->getSelectable()){
                 childs.at(selectedChildID)->setSelected(SelectionState::showAsSelected);
             }else{
                 setChildSelection(false);
             }
         }else{
+            UI_WARNING("previous selected child index is higher then child count. The index is no longer valid. Fall back to focusChild. (There might be an error in the implementation!)",id)
             setChildSelection(false);
         }
     }else{
         if(focusChild != nullptr){
             if(focusChild->getSelectable()){
-                childs.at(selectedChildID)->setSelected(SelectionState::notSelected);
+                UI_ERROR("err: focusChild is not selectable. Fallback to first selectable child",id)
+                uiElement* oldChildWithFocus = childs.at(selectedChildID);
+                if(oldChildWithFocus != nullptr){
+                    oldChildWithFocus->setSelected(SelectionState::notSelected);
+                }
                 selectedChildID = getChildIndex(focusChild);
                 focusChild->setSelected(SelectionState::showAsSelected);
             }else{
-                S_log("err: focusChild is not selectable. Fallback to first selectable child",id)
+                UI_ERROR("err: focusChild is not selectable. Fallback to first selectable child",id)
                 int cid = getNextSelectableChildID();
 
                 if(cid == -1){
-                    S_log("err: No selectable child found. Bouncing to Parent",id)
+                    UI_ERROR("err: No selectable child found. Bouncing to Parent",id)
                     focus = FocusState::parent;
                     selectFocusReceiverMethod(parent);
                 }else{
@@ -334,11 +347,11 @@ void uiElement::setChildSelection(bool ignoreFocusChild){
                 }
             }
         }else{
-            S_log("err: no focusChild. Fallback to first selectable child",id)
+            UI_ERROR("err: no focusChild. Fallback to first selectable child",id)
             int cid = getNextSelectableChildID();
 
             if(cid == -1){
-                S_log("err: No selectable child found. Bouncing to Parent",id)
+                UI_ERROR("err: No selectable child found. Bouncing to Parent",id)
                 focus = FocusState::parent;
                 selectFocusReceiverMethod(parent);
                 //parent->receiveFocus(this);
@@ -354,24 +367,24 @@ void uiElement::setChildSelection(bool ignoreFocusChild){
 }
 
 void uiElement::receiveFocus(uiElement* sender){ //todo
-    S_log("received focus",id)
+    UI_DEBUG("received focus",id)
     //check the focus mode
     switch(focusMode){
         case FocusMode::target:
             //check the direction
             switch(focus){
                 case FocusState::child:
-                    S_log("has focus, came from child",id)
+                    UI_DEBUG("has focus, came from child",id)
                     focus = FocusState::current;
                     //set selction
                     setChildSelection(true); //select previous selected child
                     break;
                 case FocusState::current:
                     //this should not happen
-                    S_log("err: Received focus but already had it.",id)
+                    UI_ERROR("err: Received focus but already had it.",id)
                     break;
                 case FocusState::parent:
-                    S_log("has focus, came from parent",id)
+                    UI_DEBUG("has focus, came from parent",id)
                     focus = FocusState::current;
                     //set selection
                     setChildSelection(false); //select focus child
@@ -382,13 +395,13 @@ void uiElement::receiveFocus(uiElement* sender){ //todo
             //check the direction
             switch(focus){
                 case FocusState::child:
-                    S_log("err: Received focus from child but we are running in collection mode. Defaulting to FocusState::current.", id);
+                    UI_ERROR("err: Received focus from child but we are running in collection mode. Defaulting to FocusState::current.", id);
                     focus = FocusState::current;
                     this->setSelected(SelectionState::Selected);
                     break;
                 case FocusState::current:
                     //this should not happen
-                    S_log("err: Received focus but already had it. Running in Collection mode.", id);
+                    UI_ERROR("err: Received focus but already had it. Running in Collection mode.", id);
                     focus = FocusState::current;
                     this->setSelected(SelectionState::Selected);
                     break;
@@ -408,7 +421,7 @@ void uiElement::receiveFocus(uiElement* sender){ //todo
                     break;
                 case FocusState::current:
                     //this should not happen
-                    S_log("err: Received focus but already had it. Passthrough enabled but direction unknown. Defaulting to parent", id);
+                    UI_ERROR("err: Received focus but already had it. Passthrough enabled but direction unknown. Defaulting to parent", id);
                     selectFocusReceiverMethod(parent);
                     //parent->receiveFocus(this);
                     break;
@@ -419,13 +432,13 @@ void uiElement::receiveFocus(uiElement* sender){ //todo
                     }else{
                         //default to first child
                         if(childs.size()>0){
-                            S_log("warn: No focusChild set. Defaulting to first child.",id)
+                            UI_WARNING("warn: No focusChild set. Defaulting to first child.",id)
                             focus = FocusState::child;
                             childWithFocus = childs.at(0);
                             childs.at(0)->receiveFocus(this);
                         }else{
                             //bounce
-                            S_log("err: No focusChild and no childs to receive focus. Defaulting to parent",id)
+                            UI_ERROR("err: No focusChild and no childs to receive focus. Defaulting to parent",id)
                             focus = FocusState::parent;
                             selectFocusReceiverMethod(parent);
                             //parent->receiveFocus(this);
@@ -435,7 +448,7 @@ void uiElement::receiveFocus(uiElement* sender){ //todo
                 }
             break;
         case FocusMode::passive:
-            S_log("err: Received focus but this element is passive. Focus gets bounced.",id)
+            UI_ERROR("err: Received focus but this element is passive. Focus gets bounced.",id)
             selectFocusReceiverMethod(parent);
             //parent->receiveFocus(this);
             break;
@@ -482,7 +495,7 @@ void uiElement::draw(frameInfo* f){
 }
 
 int uiElement::getNextSelectableChildID(){
-    S_log("getNextSelectable()",id)
+    UI_DEBUG("getNextSelectable()",id)
     int index = selectedChildID;
     int allowedChecks = childs.size();
     index++;
@@ -506,12 +519,12 @@ int uiElement::getNextSelectableChildID(){
         }
         allowedChecks--;
     }while(index != selectedChildID && allowedChecks>0);
-    S_log("err: No selectable child found.",id)
+    UI_ERROR("err: No selectable child found.",id)
     return -1;
 }
 
 int uiElement::getPriviousSelectableChildID(){
-    S_log("getPreviousSelectable()",id)
+    UI_DEBUG("getPreviousSelectable()",id)
     int index = selectedChildID;
     index--;
     if(index<0){
@@ -589,31 +602,44 @@ void uiElement::resetFocusAndSelection(bool recursive){
 };
 
 void uiElement::shiftFocusTo(uiElement* e){
+    UI_DEBUG("shiftFocusTo",id)
     if(e != nullptr){
-        if(isInChildBranch(e)){
-            for(uiElement* child : childs){
-                if(child->isInChildBranch(e)){
-                    S_log("child branch. Shift focus to child",id)
-                    focus = FocusState::child;
-                    childWithFocus->setSelected(SelectionState::notSelected); //remove selection. this is now the problem of the child
-                    childWithFocus = child;
-                    selectedChildID = getChildIndex(child);
-                    child->shiftFocusTo(e);
-                }
-            }
-        }else{
-            //child must be in parent branch
-            S_log("parent branch. shift focus to parent",id);
-            focus = FocusState::parent;
-            childWithFocus->setSelected(SelectionState::notSelected); //remove selection.
-            parent->shiftFocusTo(e);
-        }
+        //check if it is this element or a child
+        UI_DEBUG("is it me?",id)
         if(e == this){
-            S_log("focus shifted to me",id)
+            UI_DEBUG("focus shifted to me",id)
             receiveFocus(parent);
+        }else{
+            UI_DEBUG("is in child branch?",id)
+            if(isInChildBranch(e)){
+                UI_DEBUG("is in child branch",id)
+                for(uiElement* child : childs){
+                    if(child->isInChildBranch(e)){
+                        UI_DEBUG("child branch. Shift focus to child",id)
+                        focus = FocusState::child;
+                        UI_DEBUG("set focus state",id)
+                        if(childWithFocus != nullptr){
+                            UI_DEBUG("remove selection",id)
+                            childWithFocus->setSelected(SelectionState::notSelected); //remove selection. this is now the problem of the child
+                        }
+                        UI_DEBUG("set child with focus",id)
+                        childWithFocus = child;
+                        UI_DEBUG("get child index",id)
+                        selectedChildID = getChildIndex(child);
+                        UI_DEBUG("shift on child",id)
+                        child->shiftFocusTo(e);
+                    }
+                }
+            }else{
+                //child must be in parent branch
+                UI_DEBUG("parent branch. shift focus to parent",id);
+                focus = FocusState::parent;
+                childWithFocus->setSelected(SelectionState::notSelected); //remove selection.
+                parent->shiftFocusTo(e);
+            }
         }
     }else{
-        Slog("err: Element is NULL. Focus not shifted.")
+        UI_ERROR("err: Element is NULL. Focus not shifted.",id)
     }
 };
 

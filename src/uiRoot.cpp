@@ -14,7 +14,7 @@ uiRoot::~uiRoot(){
 }
 
 void uiRoot::addPage(uiPage* page){
-    Slog("addPage");
+    UI_DEBUG("addPage","uiRoot");
     pages.push_back(page);
     page->setRoot(this);
 }
@@ -41,19 +41,19 @@ void uiRoot::display(){
 }
 
 void uiRoot::goToPage(uiPage* page){
-    Slog("goToPage");
+    UI_DEBUG("goToPage","uiRoot");
     for(uiPage* page : pages){
         page->resetFocusAndSelection(true);
     }
 
     //find the page
-    Slog("find page");
+    UI_DEBUG("find page","uiRoot");
     if(getPageID(page) != -1){
         currentPage = getPageID(page);
         focus = FocusState::child;
         pages.at(currentPage)->receiveFocus(this);
     }else{
-        Slog("err: Page not found");  
+        UI_ERROR("err: Page not found","uiRoot");  
     }   
 }
 
@@ -62,7 +62,7 @@ void uiRoot::goToElement(uiElement* element){
 }
 
 void uiRoot::react(UserAction UA){
-    Slog("react");
+    UI_DEBUG("react","uiRoot");
     //reset display time
     screenOnTime=millis()+ config.screenSleepTime;
     if(globalDisplayState == ScreenState::off){
@@ -72,7 +72,7 @@ void uiRoot::react(UserAction UA){
             //the root has focus so we switch/enter a page
             switch (UA){
                 case UserAction::leftButton:
-                    Slog("left");
+                    UI_DEBUG("left","uiRoot");
                     if(currentPage == 0){
                         currentPage = pages.size()-1;
                     }else{
@@ -80,7 +80,7 @@ void uiRoot::react(UserAction UA){
                     }
                     break;
                 case UserAction::rightButton:
-                    Slog("right");
+                    UI_DEBUG("right","uiRoot");
                     if(currentPage == pages.size()-1){
                         currentPage = 0;
                     }else{
@@ -89,17 +89,17 @@ void uiRoot::react(UserAction UA){
                     break;
                 case UserAction::enterButton:
                     //we enter the page. This means the page receives focus and we switch to child
-                    Slog("enter");
+                    UI_DEBUG("enter","uiRoot");
                     focus = FocusState::child;
 
-                    Slog("push focus to");
+                    UI_DEBUG("push focus to","uiRoot");
                     pages.at(currentPage)->receiveFocus(this);
                     break;
                 default:
                     //do nothing!
 
                     //here a callback should be called
-                    Slog("unknown action");
+                    UI_DEBUG("unknown action","uiRoot");
                     break;
             }
         }
@@ -233,7 +233,7 @@ void uiRoot::shiftFocusTo(uiElement* e){
     }
 
     //find the element
-    Slog("find element");
+    UI_DEBUG("find element","uiRoot");
     for(uiPage* page : pages){
         if(page->isInChildBranch(e)){
             page->shiftFocusTo(e);
@@ -242,7 +242,7 @@ void uiRoot::shiftFocusTo(uiElement* e){
             return;
         }
     }
-    Slog("err: Element not found");                                           
+    UI_ERROR("err: Element not found","uiRoot");                                           
 }
 
 int uiRoot::getCurrentPageID(){

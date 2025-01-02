@@ -20,20 +20,20 @@ uiCheckbox::uiCheckbox(Position _position, string _text, bool _checked, uiEventC
 }
 
 void uiCheckbox::receiveFocus(uiElement* sender){
-    S_log("bounce focus",id)
+    UI_DEBUG("bounce focus",id)
     sender->receiveFocus(this);
     checked = !checked;
     SafeCallback(onRcvFocus, onRcvFocus(this, UIEventType::UIET_onChange))
 }
 
 void uiCheckbox::drawThis(frameInfo* f){
-    //S_log("draw",id);
+    //UI_DEBUG("draw",id);
     //int height = getTextSizing(f).getHeight();
     int height =  getTextSizing(f).getHeight();
 
     switch(selected){
         case SelectionState::notSelected:
-            //S_log("draw not selected",id)
+            //UI_DEBUG("draw not selected",id)
             drawFrame(
                 f,
                 uiVisualTransformation(false,false),
@@ -56,7 +56,7 @@ void uiCheckbox::drawThis(frameInfo* f){
 
         break;
         default:
-            //S_log("draw selected",id);
+            //UI_DEBUG("draw selected",id);
             if(f->highlightSelected){
                 drawBox(
                     f,

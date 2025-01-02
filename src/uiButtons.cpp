@@ -17,17 +17,17 @@ uiBasicButton::uiBasicButton(Position _position, string _text, uiEventCallback _
 }
 
 void uiBasicButton::receiveFocus(uiElement* sender){
-    S_log("bounce focus",id)
+    UI_DEBUG("bounce focus",id)
     sender->receiveFocus(this);
     onRcvFocus(this, UIEventType::UIET_onFocusBounce);
 }
 
 
 void uiBasicButton::drawThis(frameInfo* f){
-    //S_log("draw",id);
+    //UI_DEBUG("draw",id);
     switch(selected){
         case SelectionState::notSelected:
-            //S_log("draw not selected",id)
+            //UI_DEBUG("draw not selected",id)
             drawFrame(
                 f,
                 uiVisualTransformation(false,false),
@@ -42,7 +42,7 @@ void uiBasicButton::drawThis(frameInfo* f){
 
         break;
         default:
-            //S_log("draw selected",id);
+            //UI_DEBUG()"draw selected",id);
             if(f->highlightSelected){
                 drawBox(
                     f,
@@ -91,10 +91,10 @@ void uiFixedButton::receiveFocus(uiElement* sender){
 
 
 void uiFixedButton::drawThis(frameInfo* f){
-    //S_log("drawFixed",id);
+    //UI_DEBUG("drawFixed",id);
     switch(selected){
         case SelectionState::notSelected:
-            //S_log("draw not selected",id)
+            //UI_DEBUG("draw not selected",id)
             drawFrame(
                 f,
                 uiVisualTransformation(false,false),
@@ -108,7 +108,7 @@ void uiFixedButton::drawThis(frameInfo* f){
 
         break;
         default:
-            //S_log("draw selected",id);
+            //UI_DEBUG("draw selected",id);
             if(f->highlightSelected){
                 drawBox(
                     f,
@@ -154,17 +154,17 @@ uiIconButton::uiIconButton(Position _position, uiImage* _img, uiEventCallback _o
 }
 
 void uiIconButton::receiveFocus(uiElement* sender){
-    S_log("bounce focus",id)
+    UI_DEBUG("bounce focus",id)
     sender->receiveFocus(this);
     onRcvFocus(this, UIEventType::UIET_onFocusBounce);
 }
 
 
 void uiIconButton::drawThis(frameInfo* f){
-    //S_log("draw",id);
+    //UI_DEBUG("draw",id);
     switch(selected){
         case SelectionState::notSelected:
-            //S_log("draw not selected",id)
+            //UI_DEBUG("draw not selected",id)
             drawFrame(
                 f,
                 uiVisualTransformation(false,false),
@@ -179,7 +179,7 @@ void uiIconButton::drawThis(frameInfo* f){
 
         break;
         default:
-            //S_log("draw selected",id);
+            //UI_DEBUG("draw selected",id);
             if(f->highlightSelected){
                 /*
                 drawBox(
