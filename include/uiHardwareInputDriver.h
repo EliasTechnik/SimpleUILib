@@ -55,6 +55,7 @@ class uiHardwareButton{
         void switchLongpress(bool _enableLongpress);
         void configureAutopress(unsigned long _autopressSpeed = DEFAULT_AUTOPRESS_SPEED, unsigned long _autopressDelay = DEFAULT_LONGPRESS_DELAY);
         void configureLongpress(UserAction _secondaryAction = UserAction::none, unsigned long _longpressDelay = DEFAULT_LONGPRESS_DELAY);
+        
 };
 
 
@@ -62,9 +63,11 @@ class uiHardwareInputDriver{
     protected:
         std::vector<uiHardwareButton*> inputs;
         uiRoot* root;
+        uiNotifyCallback onReact; //gets called every time the an react is triggered
     public:
         uiHardwareInputDriver(uiRoot* _uiRoot);
         void addInput(uiHardwareButton* input);
         void injectInput(UserAction UA); //this is used to simulate inputs and can be used when implementing on screen navigation buttons
         void run(); //this has to be called frequently in order to process inputs correctly 
+        void setOnReactCallback(uiNotifyCallback _onReact); //this callback is triggered every time the ui reacts. This can be usefull for debugging or for triggering other actions after a user pressed a button.
 };

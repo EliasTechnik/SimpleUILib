@@ -163,11 +163,13 @@ void uiHardwareInputDriver::run(){
             if(input->isLongpressing()){
                 //longpress
                 root->react(input->getLongpressAction());
+                SafeCallback(onReact,onReact(nullptr));
                 input->satisfyLongpressRequest();
                 Slog("longpress");
             }else{
                 //shortpress
                 root->react(input->getAction());
+                SafeCallback(onReact,onReact(nullptr));
                 input->satisfyRequest();
                 Slog("shortpress");
             }
@@ -175,6 +177,7 @@ void uiHardwareInputDriver::run(){
         }
         if(input->isAutopressing()){
             root->react(input->getAction());
+            SafeCallback(onReact,onReact(nullptr));
             input->satisfyAutopressRequest();
             Slog("autopress");
         }
@@ -183,4 +186,8 @@ void uiHardwareInputDriver::run(){
 
 void uiHardwareInputDriver::injectInput(UserAction action){
     root->react(action);
+}
+
+void uiHardwareInputDriver::setOnReactCallback(uiNotifyCallback callback){
+    onReact = callback;
 }

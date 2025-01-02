@@ -618,10 +618,18 @@ void uiElement::shiftFocusTo(uiElement* e){
 };
 
 void uiElement::printTree(HardwareSerial * s, String prefix, String suffix){
-    if(focus == FocusState::current){
-        s->println(prefix + "[" + id + "]");
+    String sel = "";
+    if(selected == SelectionState::Selected){
+        sel = "#";
     }else{
-        s->println(suffix + "" + id + "");
+        if(selected == SelectionState::showAsSelected){
+            sel = "+";
+        }
+    }
+    if(focus == FocusState::current){
+        s->println(prefix + sel+ "[" + id + "]" + sel);
+    }else{
+        s->println(suffix + sel +"" + id + "" + sel);
     }
     if(childs.size() > 0){
         for(size_t i = 0; i < childs.size(); ++i){
