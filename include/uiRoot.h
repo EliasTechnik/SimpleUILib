@@ -28,13 +28,14 @@ class uiRoot{
         void drawUI(frameInfo* fi);
         void screenSwitch(ScreenState state);
         void energyManager();
+        int getPageID(uiPage* page);
     public:
         uiRoot();
         uiRoot(DisplayConfig _config);
         ~uiRoot();
         void addPage(uiPage* page);
-        bool goToPage(uiPage* page);
-        bool goToElement(uiElement* element);
+        void goToPage(uiPage* page);
+        void goToElement(uiElement* element);
         void display(); //should be called every time in the loop()
         void react(UserAction UA);
         void setConfig(DisplayConfig _config);
@@ -42,6 +43,11 @@ class uiRoot{
         void wakeUpScreen();
         void receiveFocus();
         void showStartupScreen();
+        void shiftFocusTo(uiElement* e);
+        int getCurrentPageID();
+        uiPage* getCurrentPage();
+        void removePage(uiPage* page);
+        void printTree(HardwareSerial * s); //prints the ui tree to the given serial
         //uiClassHirachyType getUIClassHirachyType() override;
 };
 

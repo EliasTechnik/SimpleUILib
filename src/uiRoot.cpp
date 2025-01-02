@@ -17,18 +17,6 @@ void uiRoot::addPage(uiPage* page){
     Slog("addPage");
     pages.push_back(page);
     page->setRoot(this);
-
-    /*
-    if(pages.size() == 1){
-        uiPage* e = pages.front();
-
-        if(e == nullptr){
-            Slog("nullptr");
-        }
-        e->receiveFocus(this);
-    }
-    */
-    
 }
 
 void uiRoot::display(){ 
@@ -52,12 +40,25 @@ void uiRoot::display(){
     FlushDisplay(&fi); 
 }
 
-bool uiRoot::goToPage(uiPage* page){
-    //todo
+void uiRoot::goToPage(uiPage* page){
+    Slog("goToPage");
+    for(uiPage* page : pages){
+        page->resetFocusAndSelection(true);
+    }
+
+    //find the page
+    Slog("find page");
+    if(getPageID(page) != -1){
+        currentPage = getPageID(page);
+        focus = FocusState::child;
+        pages.at(currentPage)->receiveFocus(this);
+    }else{
+        Slog("err: Page not found");  
+    }   
 }
 
-bool uiRoot::goToElement(uiElement* element){
-    //todo
+void uiRoot::goToElement(uiElement* element){
+    shiftFocusTo(element);
 }
 
 void uiRoot::react(UserAction UA){
@@ -89,11 +90,6 @@ void uiRoot::react(UserAction UA){
                 case UserAction::enterButton:
                     //we enter the page. This means the page receives focus and we switch to child
                     Slog("enter");
-                    //remove selection from old child //this is wrong. At this point only root should have focus
-                    //pages.at(currentPage)->removeFocus(this); //should it?
-                    //Slog("removeFocus");
-    
-
                     focus = FocusState::child;
 
                     Slog("push focus to");
@@ -111,6 +107,20 @@ void uiRoot::react(UserAction UA){
             //the child should react
             pages.at(currentPage)->react(UA);
         }
+    }
+}
+
+int uiRoot::getPageID(uiPage * page){
+    auto it = find(pages.begin(), pages.end(), page);
+
+    // If element was found
+    if (it != pages.end()){
+        // calculating the index
+        return it - pages.begin();
+    }
+    else {
+        // If the element is not present in the vector
+        return -1;
     }
 }
 
@@ -214,4 +224,54 @@ void uiRoot::showStartupScreen(){
     config.display->drawStr(50,40, SIMPLEUI_VERSION_STRING);
     config.display->drawStr(16,55,"by Elias_Technik");
     config.display->sendBuffer();
+}
+
+void uiRoot::shiftFocusTo(uiElement* e){
+    //reset all focus
+    for(uiPage* page : pages){
+        page->resetFocusAndSelection(true);
+    }
+
+    //find the element
+    Slog("find element");
+    for(uiPage* page : pages){
+        if(page->isInChildBranch(e)){
+            page->shiftFocusTo(e);
+            currentPage = getPageID(page);
+            focus = FocusState::child;
+            return;
+        }
+    }
+    Slog("err: Element not found");                                           
+}
+
+int uiRoot::getCurrentPageID(){
+    return currentPage;
+}
+
+uiPage* uiRoot::getCurrentPage(){
+    return pages.at(currentPage);
+}
+
+void uiRoot::removePage(uiPage* page){
+    auto it = find(pages.begin(), pages.end(), page);
+    if (it != pages.end()){
+        pages.erase(it);
+    }
+}
+
+void uiRoot::printTree(HardwareSerial * s){
+    s->println("UI-Tree:");
+    if(focus == FocusState::current){
+        s->println("[uiRoot]");
+    }else{
+        s->println("uiRoot");
+    }
+    for(uiPage* page : pages){
+        if(getPageID(page) == pages.size()-1){
+            page->printTree(s, "     ", "└── ");
+        }else{
+            page->printTree(s, "│    ", "├── ");
+        }
+    }
 }

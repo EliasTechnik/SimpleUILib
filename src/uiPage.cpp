@@ -29,30 +29,6 @@ void uiPage::receiveFocus(uiRoot* sender){
     S_log("uiPage: relay to child",id);
     childWithFocus = focusChild;
     focusChild->receiveFocus(this);
-    /*
-    //page cant hold focus
-    //focus has to be relayed to child/parent
-    //the focus comes from parent
-    Slog("page cant hold focus. Focus has to be relayed to child/parent")
-    if(focus == FocusState::parent){
-         focus = FocusState::child;
-            root = sender;
-            Slog("relay to child");
-            child->receiveFocus(this);
-    }else{
-        if(focus == FocusState::current){
-        focus = FocusState::parent;
-            Slog("cant hold, relay to parent");
-            root->receiveFocus(); 
-        }else{
-            if(focus == FocusState::child){
-                focus = FocusState::parent;
-                Slog("relay to parent");
-                root->receiveFocus();
-            }
-        }
-    }
-    */
 }
 
 void uiPage::receiveFocus(uiElement* sender){
@@ -65,81 +41,51 @@ uiClassHirachyType uiPage::getUIClassHirachyType(){
     return uiClassHirachyType::page;
 };
 
-//(void selectFocusReceiverMethod(uiElement* receiver);
-
-/*
-void uiPage::react(UserAction ua){
-    //a uiPage can have the focus by it self. But it is not selectable.
-    Slog("react");
-    switch(focus){
-        case FocusState::child:
-            //we hand it down
-            //get the child which has focus
-
-            elements.at(selectedChildID)->react(ua);
-
-            break;
-        case FocusState::current:
-            //we handle it
-            switch (ua){
-                case UserAction::backButton:
-                    //the focus shifts back to parent
-                    Slog("back");
-                    if(root != nullptr){
-                        focus = FocusState::parent;
-                        root->receiveFocus();
-                        //onLeave() 
-                    }
-                    break;
-                case UserAction::enterButton:
-                    Slog("enter element");
-                    //child gets focus
-                    if(child != nullptr){
-                        focus = FocusState::child;
-                        elements.at(selectedChildID)->setSelected(SelectionState::notSelected);
-                        elements.at(selectedChildID)->receiveFocus(this);
-                        //onLeave() ?   
-                    }
-                    break;
-                case UserAction::leftButton:
-                    //previous child gets selected 
-                    Slog("next Element");
-                    //remove selection from old child
-                    elements.at(selectedChildID)->setSelected(SelectionState::notSelected);
-
-                    if(selectedChildID == 0){
-                        selectedChildID = elements.size()-1;
-                    }else{
-                        selectedChildID--;
-                    }
-
-                    elements.at(selectedChildID)->setSelected(SelectionState::showAsSelected);
-                    break;
-                case UserAction::rightButton:
-                    //next child gets selected 
-                    Slog("priv Element");
-                    //remove selection from old child
-                    elements.at(selectedChildID)->setSelected(SelectionState::notSelected);
-
-                    if(selectedChildID == elements.size()-1){
-                        selectedChildID = 0;
-                    }else{
-                        selectedChildID++;
-                    }
-
-                    elements.at(selectedChildID)->setSelected(SelectionState::showAsSelected);
-                    break;
-                default:
-                    if(onInput.CB != nullptr)
-                        onInput.CB;
-                    break;
+void uiPage::resetFocusAndSelection(bool recursive){
+    S_log("resetFocusAndSelection",id);
+    focus = FocusState::parent;
+    selected = SelectionState::notSelected;
+    if(recursive){
+        if(childs.size()>0){
+            for(uiElement* child : childs){
+                child->resetFocusAndSelection(true);
             }
-            break;
-        default:
-            //this should not happen
-            Slog("Error: reacted but Parent has focus!");
-            break;
+        }
+    }
+};
+
+void uiPage::shiftFocusTo(uiElement* e){
+    if(e != nullptr){
+        if(isInChildBranch(e)){
+            for(uiElement* child : childs){
+                if(child->isInChildBranch(e)){
+                    S_log("child branch. Shift focus to child.",id)
+                    receiveFocus(root);
+                    child->shiftFocusTo(e);
+                }
+            }
+        }else{
+            //child must be in parent branch
+            S_log("err: uiPage cant be focus target.",id)
+            receiveFocus(this); //this is correct because this function will relay to the parent
+        }
+        
+    }else{
+        S_log("err: shift-target is NULL",id)
+        //do nothing
     }
 }
 
-*/
+void uiPage::printTree(HardwareSerial * s, String prefix, String suffix){
+    s->println(suffix + "" + id + "");
+    if(childs.size() > 0){
+        for(size_t i = 0; i < childs.size(); ++i){
+            uiElement* child = childs.at(i);
+            if(i == childs.size() - 1){
+                child->printTree(s, prefix + "     ", prefix + "└── ");
+            }else{
+                child->printTree(s, prefix + "|    ", prefix + "├── ");
+            }
+        }
+    }
+}

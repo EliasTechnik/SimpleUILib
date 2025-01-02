@@ -558,3 +558,79 @@ String uiElement::getConfig(){ //todo
 uiClassHirachyType uiElement::getUIClassHirachyType(){
     return uiClassHirachyType::element;
 };
+
+bool uiElement::isInChildBranch(uiElement* e){
+    if(e == this){
+        return true;
+    }else{
+        if(childs.size() == 0){
+            return false;
+        }else{
+            for(uiElement* child : childs){
+                if(child->isInChildBranch(e)){
+                    return true;
+                }
+            }
+            return false;
+        }   
+    }
+};
+
+void uiElement::resetFocusAndSelection(bool recursive){
+    focus = FocusState::parent;
+    selected = SelectionState::notSelected;
+    if(recursive){
+        if(childs.size()>0){
+            for(uiElement* child : childs){
+                child->resetFocusAndSelection(true);
+            }
+        }
+    }
+};
+
+void uiElement::shiftFocusTo(uiElement* e){
+    if(e != nullptr){
+        if(isInChildBranch(e)){
+            for(uiElement* child : childs){
+                if(child->isInChildBranch(e)){
+                    S_log("child branch. Shift focus to child",id)
+                    focus = FocusState::child;
+                    childWithFocus->setSelected(SelectionState::notSelected); //remove selection. this is now the problem of the child
+                    childWithFocus = child;
+                    selectedChildID = getChildIndex(child);
+                    child->shiftFocusTo(e);
+                }
+            }
+        }else{
+            //child must be in parent branch
+            S_log("parent branch. shift focus to parent",id);
+            focus = FocusState::parent;
+            childWithFocus->setSelected(SelectionState::notSelected); //remove selection.
+            parent->shiftFocusTo(e);
+        }
+        if(e == this){
+            S_log("focus shifted to me",id)
+            receiveFocus(parent);
+        }
+    }else{
+        Slog("err: Element is NULL. Focus not shifted.")
+    }
+};
+
+void uiElement::printTree(HardwareSerial * s, String prefix, String suffix){
+    if(focus == FocusState::current){
+        s->println(prefix + "[" + id + "]");
+    }else{
+        s->println(suffix + "" + id + "");
+    }
+    if(childs.size() > 0){
+        for(size_t i = 0; i < childs.size(); ++i){
+            uiElement* child = childs.at(i);
+            if(i == childs.size() - 1){
+                child->printTree(s, prefix + "     ", prefix + "└── ");
+            }else{
+                child->printTree(s, prefix + "|    ", prefix + "├── ");
+            }
+        }
+    }
+}
