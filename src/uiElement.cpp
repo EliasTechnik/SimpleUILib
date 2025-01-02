@@ -590,6 +590,7 @@ bool uiElement::isInChildBranch(uiElement* e){
 };
 
 void uiElement::resetFocusAndSelection(bool recursive){
+    UI_DEBUG("resetFocusAndSelection",id)
     focus = FocusState::parent;
     selected = SelectionState::notSelected;
     if(recursive){
