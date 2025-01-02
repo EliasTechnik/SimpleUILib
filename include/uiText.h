@@ -29,26 +29,19 @@ class uiText{
         void setFont(const uint8_t* _font = DEFAULT_UI_FONT);
         void setTextType(TextType _type);
         Sizing getTextSizing(frameInfo* f); 
+        string getText();
+        TextType getTextType();
+        const uint8_t* getFont();
 };
 
 
-class uiPassiveLabel: public uiCollection, public uiText{
+class uiLabel: public uiCollection, public uiText{
     protected:
         Position position;
         void drawThis(frameInfo* f) override;  
     public:
-        uiPassiveLabel();
-        uiPassiveLabel(string _text, Position _position, bool isVisible = true);
-        //TODO: setFont, setSize, setColor, setUnderline, setItallic, setBold
+        uiLabel();
+        uiLabel(string _text, Position _position, bool isVisible = true);
 };
 
-/*
-class InteractiveStaticLabel: public uiStaticLabel, public uiInteractive{
-    protected:
-        void drawThis(frameInfo* f) override;  
-    public:
-        InteractiveStaticLabel();
-        InteractiveStaticLabel(string _text, unsigned int _posX, unsigned int _posY, unsigned int _width, unsigned int _height, bool isVisible = true);
-        
-};
-*/
+

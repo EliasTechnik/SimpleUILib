@@ -73,10 +73,22 @@ Sizing uiText::getTextSizing(frameInfo* f){
     return getTextSizing(f,text);
 };
 
+string uiText::getText(){
+    return text;
+}
+
+TextType uiText::getTextType(){
+    return textType;
+}
+
+const uint8_t* uiText::getFont(){
+    return font;
+}
+
 
 //uiPassiveLabel
 
-uiPassiveLabel::uiPassiveLabel(){
+uiLabel::uiLabel(){
     //setDimension();
     visible = true;
     selectionMode = SelectionMode::notSelectable;
@@ -87,7 +99,7 @@ uiPassiveLabel::uiPassiveLabel(){
 };
 
 
-uiPassiveLabel::uiPassiveLabel(string _text, Position _position, bool isVisible){
+uiLabel::uiLabel(string _text, Position _position, bool isVisible){
     position = _position;
     selectionMode = SelectionMode::notSelectable;
     focusMode = FocusMode::passive;
@@ -99,7 +111,7 @@ uiPassiveLabel::uiPassiveLabel(string _text, Position _position, bool isVisible)
 };
 
 
-void uiPassiveLabel::drawThis(frameInfo* f){
+void uiLabel::drawThis(frameInfo* f){
     //Slog("draw2");
     bool showSelected = (selected == SelectionState::showAsSelected || selected == SelectionState::Selected);
 
