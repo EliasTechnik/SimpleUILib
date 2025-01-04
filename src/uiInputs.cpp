@@ -2,19 +2,17 @@
 
 /*
 ##########################################################
-                    uiIntValueInput
+                    uiCircularDailLogic
 ##########################################################
 */
 
+uiCircularDailLogic::uiCircularDailLogic(){
+    maxValue = 100;
+    minValue = 0;
+    value = 0;
+}
 
-
-uiIntValueInput::uiIntValueInput(Position _position, int _value, int _max, int _min, uiNotifyCallback _onChange, Padding _padding){
-    visible = true;
-    id = "uiIntValueInput";
-    selectionMode = SelectionMode::selectable;
-    focusMode = FocusMode::collection;
-    padding = _padding;
-    position = _position;
+uiCircularDailLogic::uiCircularDailLogic(int _value, int _max, int _min){
     if(_max >= _min){
         maxValue = _max;
         minValue = _min;
@@ -23,39 +21,17 @@ uiIntValueInput::uiIntValueInput(Position _position, int _value, int _max, int _
         minValue = _max;
     }
     this->setValue(_value);
-    
-    onChange = _onChange;
-    this->setTextType(number);
-    this->setText(to_string(value));
 }
 
-int uiIntValueInput::getLongestValue(){
-    if(minValue < 0 && maxValue < 0){
-        return minValue; //the lowest number is probably the longest
-    }
-    if(minValue > 0 && maxValue > 0){
-        return maxValue; //the highest number si probably the longest
-    }
-    if(minValue < 0 && maxValue > 0){
-        int a = abs(minValue);
-        if(maxValue < a){
-            return minValue;
-        }else{
-            return maxValue*-1;
-        }
-    }
-}
-
-
-int uiIntValueInput::getValue(){
+int uiCircularDailLogic::getValue(){
     return value;
 }
 
-int uiIntValueInput::setValue(int _value){
-    if(minValue <= _value <= maxValue){
+int uiCircularDailLogic::setValue(int _value){
+    if(minValue <= _value && _value <= maxValue){
         value = _value;
     }else{
-        if(_value>maxValue){
+        if(_value > maxValue){
             value = maxValue;
         }else{
             value = minValue;
@@ -64,14 +40,14 @@ int uiIntValueInput::setValue(int _value){
     return value;
 }
 
-int uiIntValueInput::increaseBy(int a, bool allowRollover){
+int uiCircularDailLogic::increaseBy(int a, bool allowRollover){
     if(allowRollover){
         int availRange = maxValue - value;
         int range = maxValue - minValue;
         if(a>availRange){
             int add = a - availRange;
             add = add % range;
-            value = minValue + add;
+            value = minValue + add;// - 1; //remove 1 if buggy
         }else{
             value = value + a;
         }
@@ -82,14 +58,14 @@ int uiIntValueInput::increaseBy(int a, bool allowRollover){
     }
 }
 
-int uiIntValueInput::decreaseBy(int a, bool allowRollover){
+int uiCircularDailLogic::decreaseBy(int a, bool allowRollover){
     if(allowRollover){
         int availRange = value-minValue;
         int range = maxValue - minValue;
         if(a>availRange){
             int sub = a - availRange;
             sub = sub % range;
-            value = maxValue - sub;
+            value = maxValue - sub;// + 1; //remove 1 if buggy
         }else{
             value = value - a;
         }
@@ -99,15 +75,50 @@ int uiIntValueInput::decreaseBy(int a, bool allowRollover){
     }
 }
 
-int uiIntValueInput::changeBy(int a, bool allowRollover){
+int uiCircularDailLogic::changeBy(int a, bool allowRollover){
     if(a>=0){
         return increaseBy(a, allowRollover);
     }else{
-        return decreaseBy(a, allowRollover);
+        return decreaseBy((a*-1), allowRollover);
     }
 }
 
 
+
+/*
+##########################################################
+                    uiIntValueInput
+##########################################################
+*/
+
+uiIntValueInput::uiIntValueInput(Position _position, int _value, int _max, int _min, uiNotifyCallback _onChange, Padding _padding):uiCircularDailLogic(_value,_max,_min){
+    visible = true;
+    id = "uiIntValueInput";
+    selectionMode = SelectionMode::selectable;
+    focusMode = FocusMode::collection;
+    padding = _padding;
+    position = _position;    
+    onChange = _onChange;
+    this->setTextType(number);
+    this->setText(to_string(value));
+}
+
+int uiIntValueInput::getLongestValue(){
+    if(minValue < 0 && maxValue < 0){
+        return minValue; //the lowest number is probably the longest
+    }
+    if(minValue > 0 && maxValue > 0){
+        return maxValue; //the highest number is probably the longest
+    }
+    if(minValue < 0 && maxValue > 0){
+        int a = abs(minValue);
+        if(maxValue < a){
+            return minValue;
+        }else{
+            return maxValue*-1;
+        }
+    }
+}
 
 void uiIntValueInput::drawThis(frameInfo* f){
     //S_log("draw",id);

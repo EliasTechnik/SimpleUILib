@@ -20,7 +20,7 @@ Posible log levels:
 */
 
 #ifndef GLOBAL_UI_LOG_LEVEL
-  #define GLOBAL_UI_LOG_LEVEL 1
+  #define GLOBAL_UI_LOG_LEVEL 4
 #endif
 
 inline void slog(String file, int line, String functionname, String message){

@@ -58,16 +58,28 @@ class uiHardwareButton{
         
 };
 
+enum uiHIDInputInsertCBMode{
+    notifyAndReact, //the insertCallback is called and the UI reacts
+    ReactOnly,      //the insertCallback is not called but the UI reacts
+    notifyOnly,     //the insertCallback is called but the UI does not react
+};
 
 class uiHardwareInputDriver{
     protected:
         std::vector<uiHardwareButton*> inputs;
         uiRoot* root;
         uiNotifyCallback onReact; //gets called every time the an react is triggered
+        uiInputCallback inputInsert = nullptr;
+        uiHIDInputInsertCBMode inputInsertMode = uiHIDInputInsertCBMode::notifyAndReact;
+        void inputInsertCallback(UserAction UA);
     public:
         uiHardwareInputDriver(uiRoot* _uiRoot);
         void addInput(uiHardwareButton* input);
-        void injectInput(UserAction UA); //this is used to simulate inputs and can be used when implementing on screen navigation buttons
+        void injectInput(UserAction UA); //this is used to simulate inputs and can be used when implementing on screen navigation buttons. Injected inputs are always relayed to the ui and injected after the input procesing.
+        void injectHardwareInput(UserAction UA); //this is used to simulate inputs and can be used when implementing custom input logic. Other then injectInput this will be injected at the begining of the input processing.
         void run(); //this has to be called frequently in order to process inputs correctly 
-        void setOnReactCallback(uiNotifyCallback _onReact); //this callback is triggered every time the ui reacts. This can be usefull for debugging or for triggering other actions after a user pressed a button.
+        void setOnReactCallback(uiNotifyCallback _onReact); //this callback is triggered every time the ui reacts. 
+        //This can be usefull for debugging or for triggering other actions after a user pressed a button.
+        void setInputInsertCallback(uiInputCallback _inputInsert, uiHIDInputInsertCBMode mode = uiHIDInputInsertCBMode::notifyAndReact); 
+        void switchInputInsertCallbackMode(uiHIDInputInsertCBMode mode);
 };

@@ -260,6 +260,8 @@ struct InputAction{
 
 typedef void (*uiEventCallback)(void *sender, UIEventType event_type);
 
+typedef void (*uiInputCallback)(UserAction action);
+
 typedef void (*uiNotifyCallback)(void *sender);
 
 struct uiCallback{

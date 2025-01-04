@@ -19,6 +19,10 @@ void uiRoot::addPage(uiPage* page){
     page->setRoot(this);
 }
 
+bool uiRoot::isScreenOn(){
+    return globalDisplayState == ScreenState::on;
+}
+
 void uiRoot::display(){ 
     if(screenOnTime==0){
         screenOnTime=millis()+ config.screenSleepTime;
@@ -171,6 +175,7 @@ ScreenState uiRoot::getScreenState(){
 void uiRoot::wakeUpScreen(){
     screenSwitch(ScreenState::on);
     lastInputTime = millis();
+    screenOnTime=millis()+ config.screenSleepTime;
 }
 
 void uiRoot::screenSwitch(ScreenState state){

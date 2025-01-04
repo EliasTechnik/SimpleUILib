@@ -132,6 +132,9 @@ Sizing Sizing::getSizing(){
 };
 
 //Dimension
+/*
+TODO: Implement getter and setter for width and height in Dimension. The inherited fuctions ignore the 2-Point mode and return wron values.
+*/
 Dimension::Dimension():Sizing(),Position(){
     treatAs2PointBox = false;
 };

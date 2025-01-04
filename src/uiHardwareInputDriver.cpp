@@ -157,18 +157,33 @@ void uiHardwareInputDriver::addInput(uiHardwareButton* input){
     inputs.push_back(input);
 }
 
+void uiHardwareInputDriver::inputInsertCallback(UserAction UA){
+    if(inputInsertMode == uiHIDInputInsertCBMode::notifyAndReact){
+        SafeCallback(inputInsert,inputInsert(UA));
+        root->react(UA);
+    }else if(inputInsertMode == uiHIDInputInsertCBMode::ReactOnly){
+        root->react(UA);
+    }else if(inputInsertMode == uiHIDInputInsertCBMode::notifyOnly){
+        SafeCallback(inputInsert,inputInsert(UA));
+    }
+}
+
+void uiHardwareInputDriver::injectHardwareInput(UserAction UA){
+    inputInsertCallback(UA);
+}
+
 void uiHardwareInputDriver::run(){
     for(uiHardwareButton* input : inputs){
         if(input->hasPendingRequests()){
             if(input->isLongpressing()){
                 //longpress
-                root->react(input->getLongpressAction());
+                inputInsertCallback(input->getLongpressAction());
                 SafeCallback(onReact,onReact(nullptr));
                 input->satisfyLongpressRequest();
                 UI_DEBUG("longpress","HID");
             }else{
                 //shortpress
-                root->react(input->getAction());
+                inputInsertCallback(input->getAction());
                 SafeCallback(onReact,onReact(nullptr));
                 input->satisfyRequest();
                 UI_DEBUG("shortpress","HID");
@@ -188,6 +203,17 @@ void uiHardwareInputDriver::injectInput(UserAction action){
     root->react(action);
 }
 
+
+
 void uiHardwareInputDriver::setOnReactCallback(uiNotifyCallback callback){
     onReact = callback;
+}
+
+void uiHardwareInputDriver::setInputInsertCallback(uiInputCallback callback, uiHIDInputInsertCBMode mode){
+    inputInsert = callback;
+    inputInsertMode = mode;
+}
+
+void uiHardwareInputDriver::switchInputInsertCallbackMode(uiHIDInputInsertCBMode mode){
+    inputInsertMode = mode;
 }

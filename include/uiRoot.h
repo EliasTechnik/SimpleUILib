@@ -41,6 +41,7 @@ class uiRoot{
         void setConfig(DisplayConfig _config);
         ScreenState getScreenState();
         void wakeUpScreen();
+        bool isScreenOn();
         void receiveFocus();
         void showStartupScreen();
         void shiftFocusTo(uiElement* e);
