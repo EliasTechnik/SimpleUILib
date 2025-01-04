@@ -63,8 +63,12 @@ void uiHardwareButton::trigger(){
             blockLongPress = false;
         }else{
             //shortpress
-            request=ButtonRequest::shortpress;
-            requestSatisfied=false;
+            if(millis()>unlockAfter){
+                request=ButtonRequest::shortpress;
+                requestSatisfied=false;
+            }else{
+                UI_INFO("blocked shortpress because the last satisfy was just a moment ago [DEFAULT_LOCK_TIME]","uiHardwareButton");
+            }
         }
     }
     if(lastReadValue==floatingValue && v==!floatingValue){
@@ -106,7 +110,7 @@ bool uiHardwareButton::isAutopressing(){
 bool uiHardwareButton::isLongpressing(){
     if(enableLongpress && !enableAutopress){
         if(triggerLongPressAfter<millis() && state == ButtonStates::down){
-            if(!blockLongPress){
+            if(!blockLongPress && millis()>unlockAfter){
                 request=ButtonRequest::longpress;
                 requestSatisfied=false;
                 return true;
@@ -177,10 +181,13 @@ void uiHardwareInputDriver::run(){
         if(input->hasPendingRequests()){
             if(input->isLongpressing()){
                 //longpress
-                inputInsertCallback(input->getLongpressAction());
-                SafeCallback(onReact,onReact(nullptr));
-                input->satisfyLongpressRequest();
-                UI_DEBUG("longpress","HID");
+                if(unlockLongpressAfter<millis()){
+                    unlockLongpressAfter = 0;
+                    inputInsertCallback(input->getLongpressAction());
+                    SafeCallback(onReact,onReact(nullptr));
+                    input->satisfyLongpressRequest();
+                    UI_DEBUG("longpress","HID");
+                }
             }else{
                 //shortpress
                 inputInsertCallback(input->getAction());
@@ -216,4 +223,16 @@ void uiHardwareInputDriver::setInputInsertCallback(uiInputCallback callback, uiH
 
 void uiHardwareInputDriver::switchInputInsertCallbackMode(uiHIDInputInsertCBMode mode){
     inputInsertMode = mode;
+}
+
+void uiHardwareInputDriver::blockLongpressUntilLifted(){
+    for(uiHardwareButton* input : inputs){
+        if(input->isLongpressing()){
+            input->satisfyLongpressRequest();
+        }
+    }
+}
+
+void uiHardwareInputDriver::timeoutLongpress(unsigned long timeout){
+    unlockLongpressAfter = millis()+timeout;
 }

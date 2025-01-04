@@ -71,6 +71,7 @@ class uiHardwareInputDriver{
         uiNotifyCallback onReact = nullptr; //gets called every time the an react is triggered
         uiInputCallback inputInsert = nullptr;
         uiHIDInputInsertCBMode inputInsertMode = uiHIDInputInsertCBMode::notifyAndReact;
+        unsigned long unlockLongpressAfter = 0;
         void inputInsertCallback(UserAction UA);
     public:
         uiHardwareInputDriver(uiRoot* _uiRoot);
@@ -82,4 +83,6 @@ class uiHardwareInputDriver{
         //This can be usefull for debugging or for triggering other actions after a user pressed a button.
         void setInputInsertCallback(uiInputCallback _inputInsert, uiHIDInputInsertCBMode mode = uiHIDInputInsertCBMode::notifyAndReact); 
         void switchInputInsertCallbackMode(uiHIDInputInsertCBMode mode);
+        void blockLongpressUntilLifted(); //this will block any longpress until the button is lifted. This can be usefull when some of the logic is handled outside of the HID.
+        void timeoutLongpress(unsigned long timeout = DEFAULT_LONGPRESS_DELAY); //this will trigger a longpress timeout which blocks all long presses for a givven amount of time. This can be usefull when some of the logic is handled outside of the HID.
 };

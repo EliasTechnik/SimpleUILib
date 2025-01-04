@@ -49,6 +49,7 @@ class uiRoot{
         uiPage* getCurrentPage();
         void removePage(uiPage* page);
         void printTree(HardwareSerial * s); //prints the ui tree to the given serial
+        uiPage* getPageByID(String id);
         //uiClassHirachyType getUIClassHirachyType() override;
 };
 

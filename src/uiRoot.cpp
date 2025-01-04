@@ -46,19 +46,24 @@ void uiRoot::display(){
 
 void uiRoot::goToPage(uiPage* page){
     UI_DEBUG("goToPage","uiRoot");
-    for(uiPage* page : pages){
-        page->resetFocusAndSelection(true);
-    }
-
     //find the page
     UI_DEBUG("find page","uiRoot");
-    if(getPageID(page) != -1){
-        currentPage = getPageID(page);
-        focus = FocusState::child;
-        pages.at(currentPage)->receiveFocus(this);
-    }else{
-        UI_ERROR("err: Page not found","uiRoot");  
-    }   
+    if(page != nullptr){
+        if(getPageID(page) != -1){
+            //reset all focus
+            for(uiPage* page : pages){
+                page->resetFocusAndSelection(true);
+            }
+            //switch to the page
+            currentPage = getPageID(page);
+            focus = FocusState::child;
+            pages.at(currentPage)->receiveFocus(this);
+        }else{
+            UI_ERROR("err: Page not found","uiRoot");  
+        }  
+    }else{  
+        UI_ERROR("err: Page is null","uiRoot");
+    } 
 }
 
 void uiRoot::goToElement(uiElement* element){
@@ -279,4 +284,13 @@ void uiRoot::printTree(HardwareSerial * s){
             page->printTree(s, "│    ", "├── ");
         }
     }
+}
+
+uiPage* uiRoot::getPageByID(String id){
+    for(uiPage* page : pages){
+        if(page->getID() == id){
+            return page;
+        }
+    }
+    return nullptr;
 }

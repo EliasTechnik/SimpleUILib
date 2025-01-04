@@ -41,14 +41,17 @@ int uiCircularDailLogic::setValue(int _value){
 }
 
 int uiCircularDailLogic::increaseBy(int a, bool allowRollover){
+    //a = 1, maxValue = 255, value = 255, minValue = 0
     if(allowRollover){
-        int availRange = maxValue - value;
-        int range = maxValue - minValue;
-        if(a>availRange){
-            int add = a - availRange;
-            add = add % range;
-            value = minValue + add;// - 1; //remove 1 if buggy
+        int availRange = maxValue - value; //255-255 = 0
+        int range = (maxValue - minValue); //255-0 = 255 
+        if(a>availRange){ //1>0
+        //roll over
+            int add = a - availRange;// 1-0 = 1
+            add = add % range; // 1%255 = 1
+            value = minValue + (add - 1); // 0+1 = 1 (buggy) //sub 1 if buggy
         }else{
+        //no roll over
             value = value + a;
         }
         return value;
@@ -61,11 +64,11 @@ int uiCircularDailLogic::increaseBy(int a, bool allowRollover){
 int uiCircularDailLogic::decreaseBy(int a, bool allowRollover){
     if(allowRollover){
         int availRange = value-minValue;
-        int range = maxValue - minValue;
+        int range = (maxValue - minValue) + 1; //still buggy
         if(a>availRange){
             int sub = a - availRange;
             sub = sub % range;
-            value = maxValue - sub;// + 1; //remove 1 if buggy
+            value = maxValue - (sub - 1);// + 1; //remove 1 if buggy
         }else{
             value = value - a;
         }

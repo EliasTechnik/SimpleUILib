@@ -669,3 +669,7 @@ void uiElement::printTree(HardwareSerial * s, String prefix, String suffix){
         }
     }
 }
+
+String uiElement::getID(){
+    return id;
+};

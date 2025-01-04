@@ -59,6 +59,7 @@ class uiElement{
         virtual void receiveFocus(uiElement* sender);
         FocusState getFocusState();
         void setID(String _id);
+        String getID();
         String getConfig();
         virtual uiClassHirachyType getUIClassHirachyType();
         void resetFocusAndSelection(bool recursive = false); //resers focus and selection to the default values. This is used when the focus is shifted to another element.
