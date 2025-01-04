@@ -68,7 +68,7 @@ class uiHardwareInputDriver{
     protected:
         std::vector<uiHardwareButton*> inputs;
         uiRoot* root;
-        uiNotifyCallback onReact; //gets called every time the an react is triggered
+        uiNotifyCallback onReact = nullptr; //gets called every time the an react is triggered
         uiInputCallback inputInsert = nullptr;
         uiHIDInputInsertCBMode inputInsertMode = uiHIDInputInsertCBMode::notifyAndReact;
         void inputInsertCallback(UserAction UA);
