@@ -204,7 +204,7 @@ void uiElement::react(UserAction UA){
                     if(parent != nullptr){
                         focus = FocusState::parent;
                         if(parent != nullptr){
-                            selectFocusReceiverMethod(parent);
+                            selectFocusReceiverMethod(parent, false);
                             //parent->receiveFocus(this);
                             if(selectedChildID != -1){
                                 childs.at(selectedChildID)->setSelected(SelectionState::notSelected);
@@ -228,7 +228,7 @@ void uiElement::react(UserAction UA){
                                 childWithFocus = childs.at(selectedChildID);
                                 focus = FocusState::child;
                                 childWithFocus->setSelected(SelectionState::notSelected); //remove selection. this is now the problem of the child
-                                childWithFocus->receiveFocus(this);
+                                childWithFocus->receiveFocus(this, false);
                             }else{
                                 UI_ERROR("err: No child selected. TODO?",id); 
                                 SafeCallback(onUnassignedInput, onUnassignedInput(this, UIET_onEnter));
@@ -291,19 +291,19 @@ void uiElement::react(UserAction UA){
     };
 };
 
-void uiElement::selectFocusReceiverMethod(uiElement* receiver){
+void uiElement::selectFocusReceiverMethod(uiElement* receiver, bool isPreselection){
     uiClassHirachyType type = receiver->getUIClassHirachyType();
     
     if(type ==  uiClassHirachyType::page){
         //uiPage* page = dynamic_cast<uiPage*>(receiver);
         uiPage* page = static_cast<uiPage*>(receiver);
         if(page != nullptr){
-            page->receiveFocus(this);
+            page->receiveFocus(this, isPreselection); //check if this is correct
         }else{
             UI_ERROR("err: Cast to page failed.",id);
         }
     }else{
-        receiver->receiveFocus(this);   
+        receiver->receiveFocus(this, isPreselection);   
     };
 }
 
@@ -338,7 +338,7 @@ void uiElement::setChildSelection(bool ignoreFocusChild){
                 if(cid == -1){
                     UI_ERROR("err: No selectable child found. Bouncing to Parent",id)
                     focus = FocusState::parent;
-                    selectFocusReceiverMethod(parent);
+                    selectFocusReceiverMethod(parent,false);
                 }else{
                     //remove selection from old child
                     childs.at(selectedChildID)->setSelected(SelectionState::notSelected);
@@ -353,7 +353,7 @@ void uiElement::setChildSelection(bool ignoreFocusChild){
             if(cid == -1){
                 UI_ERROR("err: No selectable child found. Bouncing to Parent",id)
                 focus = FocusState::parent;
-                selectFocusReceiverMethod(parent);
+                selectFocusReceiverMethod(parent,false);
                 //parent->receiveFocus(this);
             }else{
                 //remove selection from old child
@@ -366,7 +366,7 @@ void uiElement::setChildSelection(bool ignoreFocusChild){
 
 }
 
-void uiElement::receiveFocus(uiElement* sender){ //todo
+void uiElement::receiveFocus(uiElement* sender, bool isPreselection){ //todo
     UI_DEBUG("received focus",id)
     //check the focus mode
     switch(focusMode){
@@ -416,31 +416,31 @@ void uiElement::receiveFocus(uiElement* sender){ //todo
             switch(focus){
                 case FocusState::child:
                     focus = FocusState::parent;
-                    selectFocusReceiverMethod(parent);
+                    selectFocusReceiverMethod(parent, isPreselection);
                     //parent->receiveFocus(this);
                     break;
                 case FocusState::current:
                     //this should not happen
                     UI_ERROR("err: Received focus but already had it. Passthrough enabled but direction unknown. Defaulting to parent", id);
-                    selectFocusReceiverMethod(parent);
+                    selectFocusReceiverMethod(parent, isPreselection);
                     //parent->receiveFocus(this);
                     break;
                 case FocusState::parent:
                     if(focusChild != nullptr){
                         focus = FocusState::child;
-                        focusChild->receiveFocus(this);
+                        focusChild->receiveFocus(this, isPreselection);
                     }else{
                         //default to first child
                         if(childs.size()>0){
                             UI_WARNING("warn: No focusChild set. Defaulting to first child.",id)
                             focus = FocusState::child;
                             childWithFocus = childs.at(0);
-                            childs.at(0)->receiveFocus(this);
+                            childs.at(0)->receiveFocus(this, isPreselection);
                         }else{
                             //bounce
                             UI_ERROR("err: No focusChild and no childs to receive focus. Defaulting to parent",id)
                             focus = FocusState::parent;
-                            selectFocusReceiverMethod(parent);
+                            selectFocusReceiverMethod(parent, isPreselection);
                             //parent->receiveFocus(this);
                         }
                     }
@@ -449,7 +449,7 @@ void uiElement::receiveFocus(uiElement* sender){ //todo
             break;
         case FocusMode::passive:
             UI_ERROR("err: Received focus but this element is passive. Focus gets bounced.",id)
-            selectFocusReceiverMethod(parent);
+            selectFocusReceiverMethod(parent, isPreselection);
             //parent->receiveFocus(this);
             break;
     }    
@@ -609,7 +609,7 @@ void uiElement::shiftFocusTo(uiElement* e){
         UI_DEBUG("is it me?",id)
         if(e == this){
             UI_DEBUG("focus shifted to me",id)
-            receiveFocus(parent);
+            receiveFocus(parent, true);
         }else{
             UI_DEBUG("is in child branch?",id)
             if(isInChildBranch(e)){

@@ -17,7 +17,8 @@ class uiCheckbox: public uiSelectableCollection, public uiText, public uiBox, pu
         bool checked = false;
         void drawThis(frameInfo* f) override;
         uiEventCallback onRcvFocus;
+        uiEventCallback onChange;
     public:
-        uiCheckbox(Position _position, string _text, bool _checked, uiEventCallback _onRcvFocus, Padding _padding = UI_DEFAULT_PADDING_2a);
-        void receiveFocus(uiElement* sender) override;
+        uiCheckbox(Position _position, string _text, bool _checked, uiEventCallback _onChange, uiEventCallback _onRcvFocus = nullptr, Padding _padding = UI_DEFAULT_PADDING_2a);
+        void receiveFocus(uiElement* sender, bool isPreselection) override;
 };

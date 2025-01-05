@@ -57,7 +57,7 @@ void uiRoot::goToPage(uiPage* page){
             //switch to the page
             currentPage = getPageID(page);
             focus = FocusState::child;
-            pages.at(currentPage)->receiveFocus(this);
+            pages.at(currentPage)->receiveFocus(this, true);
         }else{
             UI_ERROR("err: Page not found","uiRoot");  
         }  
@@ -78,39 +78,44 @@ void uiRoot::react(UserAction UA){
         screenSwitch(ScreenState::on);
     }else{
         if(this->focus == FocusState::current){
-            //the root has focus so we switch/enter a page
-            switch (UA){
-                case UserAction::leftButton:
-                    UI_DEBUG("left","uiRoot");
-                    if(currentPage == 0){
-                        currentPage = pages.size()-1;
-                    }else{
-                        currentPage--;
-                    }
-                    break;
-                case UserAction::rightButton:
-                    UI_DEBUG("right","uiRoot");
-                    if(currentPage == pages.size()-1){
-                        currentPage = 0;
-                    }else{
-                        currentPage++;
-                    }
-                    break;
-                case UserAction::enterButton:
-                    //we enter the page. This means the page receives focus and we switch to child
-                    UI_DEBUG("enter","uiRoot");
-                    focus = FocusState::child;
+            if(!isPageNavigationDeactivated){
+                //the root has focus so we switch/enter a page
+                switch (UA){
+                    case UserAction::leftButton:
+                        UI_DEBUG("left","uiRoot");
+                        if(currentPage == 0){
+                            currentPage = pages.size()-1;
+                        }else{
+                            currentPage--;
+                        }
+                        break;
+                    case UserAction::rightButton:
+                        UI_DEBUG("right","uiRoot");
+                        if(currentPage == pages.size()-1){
+                            currentPage = 0;
+                        }else{
+                            currentPage++;
+                        }
+                        break;
+                    case UserAction::enterButton:
+                        //we enter the page. This means the page receives focus and we switch to child
+                        UI_DEBUG("enter","uiRoot");
+                        focus = FocusState::child;
 
-                    UI_DEBUG("push focus to","uiRoot");
-                    pages.at(currentPage)->receiveFocus(this);
-                    break;
-                default:
-                    //do nothing!
+                        UI_DEBUG("push focus to","uiRoot");
+                        pages.at(currentPage)->receiveFocus(this, false);
+                        break;
+                    default:
+                        //do nothing!
 
-                    //here a callback should be called
-                    UI_DEBUG("unknown action","uiRoot");
-                    break;
+                        //here a callback should be called
+                        UI_DEBUG("unknown action","uiRoot");
+                        break;
+                }
+            }else{
+                UI_INFO("Page navigation deactivated.","uiRoot");
             }
+            
         }
         else{
             //the child should react
@@ -214,17 +219,12 @@ void uiRoot::energyManager(){
 }
 
 void uiRoot::receiveFocus(){
-    if(pages.size()>1){
-        //Slog("got focus")
-        focus = FocusState::current;
+    if(isPageNavigationDeactivated){
+        //bounce focus back to page
+        pages.at(currentPage)->receiveFocus(this, true);
     }else{
-        //reject focus
-        //Slog("would like to reject focus")
         focus = FocusState::current;
-        //focus = FocusState::child;
-        //pages.at(currentPage)->receiveFocus(this);
-    }
-   
+    }   
 }
 
 void uiRoot::showStartupScreen(){
@@ -293,4 +293,16 @@ uiPage* uiRoot::getPageByID(String id){
         }
     }
     return nullptr;
+}
+
+void uiRoot::deactivatePageNavigation(bool deactivate){
+    UI_DEBUG("deactivatePageNavigation","uiRoot");
+    isPageNavigationDeactivated = deactivate;
+    if(pages.size()>currentPage){
+        uiPage* cp = pages.at(currentPage);
+        if(cp != nullptr){
+            cp->receiveFocus(this, true);
+        }
+    }
+    
 }

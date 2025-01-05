@@ -24,17 +24,17 @@ void uiPage::setRoot(uiRoot* _root){
     root = _root;
 }
 
-void uiPage::receiveFocus(uiRoot* sender){
+void uiPage::receiveFocus(uiRoot* sender, bool isPreselection){
     focus = FocusState::child;
     UI_DEBUG("uiPage: relay to child",id);
     childWithFocus = focusChild;
-    focusChild->receiveFocus(this);
+    focusChild->receiveFocus(this, isPreselection);
 }
 
-void uiPage::receiveFocus(uiElement* sender){
+void uiPage::receiveFocus(uiElement* sender, bool isPreselection){
     focus = FocusState::parent;
     UI_DEBUG("uiPage: relay to parent",id);
-    root->receiveFocus();
+    root->receiveFocus(); //when relaying to root we obmit the isPreselection flag (because the root does not care)
 };
 
 uiClassHirachyType uiPage::getUIClassHirachyType(){
@@ -60,14 +60,14 @@ void uiPage::shiftFocusTo(uiElement* e){
             for(uiElement* child : childs){
                 if(child->isInChildBranch(e)){
                     UI_DEBUG("child branch. Shift focus to child.",id)
-                    receiveFocus(root);
+                    receiveFocus(root, true);
                     child->shiftFocusTo(e);
                 }
             }
         }else{
             //child must be in parent branch
             UI_ERROR("err: uiPage cant be focus target.",id)
-            receiveFocus(this); //this is correct because this function will relay to the parent
+            receiveFocus(this,true); //this is correct because this function will relay to the parent
         }
         
     }else{

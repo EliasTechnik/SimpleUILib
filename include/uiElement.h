@@ -35,8 +35,7 @@ class uiElement{
         void drawChilds(frameInfo* f); //draws all childs
         int getChildIndex(uiElement* child); //returns the numerical id of the given child. If the child is not found it returns -1
         void setChildSelection(bool ignoreFocusChild); //sets the selection of the child elements. If ignoreFocusChild is true the focusChild will be ignored.
-        virtual void selectFocusReceiverMethod(uiElement* receiver); 
-        
+        virtual void selectFocusReceiverMethod(uiElement* receiver, bool isPreselection); 
     public:
         uiElement();
         ~uiElement();
@@ -56,7 +55,8 @@ class uiElement{
         //virtual uiElement* getChild();
         void draw(frameInfo* f); 
         virtual void react(UserAction UA);
-        virtual void receiveFocus(uiElement* sender);
+        virtual void receiveFocus(uiElement* sender, bool isPreselection); //some elements trigger callbacks when they receive focus and bounce it. 
+        //To prevent actions triggered by focus changes the isPreselection flag can be set to true. 
         FocusState getFocusState();
         void setID(String _id);
         String getID();

@@ -108,12 +108,16 @@ uiIntValueInput::uiIntValueInput(Position _position, int _value, int _max, int _
 
 int uiIntValueInput::getLongestValue(){
     if(minValue < 0 && maxValue < 0){
+        //negative range
         return minValue; //the lowest number is probably the longest
     }
     if(minValue > 0 && maxValue > 0){
+        //positive range
         return maxValue; //the highest number is probably the longest
     }
-    if(minValue < 0 && maxValue > 0){
+    //if(minValue < 0 && maxValue > 0){
+    else{
+        //mixed range
         int a = abs(minValue);
         if(maxValue < a){
             return minValue;
@@ -203,7 +207,7 @@ void uiIntValueInput::react(UserAction UA){
                     if(parent != nullptr){
                         focus = FocusState::parent;
                          UI_DEBUG("back to parent",id);
-                        selectFocusReceiverMethod(parent);
+                        selectFocusReceiverMethod(parent, false);
                     }else{
                             UI_ERROR("err: element is orphan! (has no parent)",id);
                         }

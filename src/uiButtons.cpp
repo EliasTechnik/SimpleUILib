@@ -5,7 +5,7 @@
                     uiBasicButton
 ##########################################################
 */
-uiBasicButton::uiBasicButton(Position _position, string _text, uiEventCallback _onRcvFocus, Padding _padding){
+uiBasicButton::uiBasicButton(Position _position, string _text, uiEventCallback _onUserPressed, uiEventCallback _onRcvFocus, Padding _padding){
     visible = true;
     id = "uiBasicButton";
     selectionMode = SelectionMode::selectable;
@@ -14,12 +14,16 @@ uiBasicButton::uiBasicButton(Position _position, string _text, uiEventCallback _
     position = _position;
     text = _text;
     onRcvFocus = _onRcvFocus;
+    onUserPressed = _onUserPressed;
 }
 
-void uiBasicButton::receiveFocus(uiElement* sender){
+void uiBasicButton::receiveFocus(uiElement* sender, bool isPreselection){
     UI_DEBUG("bounce focus",id)
-    sender->receiveFocus(this);
-    onRcvFocus(this, UIEventType::UIET_onFocusBounce);
+    sender->receiveFocus(this, isPreselection);
+    SafeCallback(onRcvFocus, onRcvFocus(this, UIEventType::UIET_onFocusBounce));
+    if(!isPreselection){
+        SafeCallback(onUserPressed,onUserPressed(this, UIEventType::UIET_onClick));
+    }
 }
 
 
@@ -85,8 +89,15 @@ uiFixedButton::uiFixedButton(Dimension _dimension, string _text, Padding _paddin
     text = _text;
 }
 
-void uiFixedButton::receiveFocus(uiElement* sender){
-
+void uiFixedButton::receiveFocus(uiElement* sender, bool isPreselection){
+    /*
+    UI_DEBUG("bounce focus",id)
+    sender->receiveFocus(this);
+    SafeCallback(onRcvFocus, onRcvFocus(this, UIEventType::UIET_onFocusBounce));
+    if(!isPreselection){
+        SafeCallback(onUserPressed,onUserPressed(this, UIEventType::UIET_onClick));
+    }
+    */
 }
 
 
@@ -141,7 +152,7 @@ void uiFixedButton::drawThis(frameInfo* f){
 ##########################################################
 */
 
-uiIconButton::uiIconButton(Position _position, uiImage* _img, uiEventCallback _onRcvFocus, Padding _padding){
+uiIconButton::uiIconButton(Position _position, uiImage* _img, uiEventCallback _onUserPressed, uiEventCallback _onRcvFocus, Padding _padding){
     visible = true;
     id = "uiIconButton";
     selectionMode = SelectionMode::selectable;
@@ -151,12 +162,16 @@ uiIconButton::uiIconButton(Position _position, uiImage* _img, uiEventCallback _o
     setImage(_img);
     
     onRcvFocus = _onRcvFocus;
+    onUserPressed = _onUserPressed;
 }
 
-void uiIconButton::receiveFocus(uiElement* sender){
+void uiIconButton::receiveFocus(uiElement* sender, bool isPreselection){
     UI_DEBUG("bounce focus",id)
-    sender->receiveFocus(this);
-    onRcvFocus(this, UIEventType::UIET_onFocusBounce);
+    sender->receiveFocus(this, isPreselection);
+    SafeCallback(onRcvFocus, onRcvFocus(this, UIEventType::UIET_onFocusBounce));
+    if(!isPreselection){
+        SafeCallback(onUserPressed,onUserPressed(this, UIEventType::UIET_onClick));
+    }
 }
 
 

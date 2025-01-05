@@ -7,7 +7,7 @@
 ######################################################
 */
 
-uiRadio::uiRadio(Position _position, string _text, bool _checked, uiEventCallback _onRcvFocus, Padding _padding){
+uiRadio::uiRadio(Position _position, string _text, bool _checked, uiEventCallback _onChange, uiEventCallback _onRcvFocus, Padding _padding){
     visible = true;
     id = "uiRadio";
     selectionMode = SelectionMode::selectable;
@@ -17,14 +17,18 @@ uiRadio::uiRadio(Position _position, string _text, bool _checked, uiEventCallbac
     text = _text;
     checked = _checked;
     onRcvFocus = _onRcvFocus;
+    onChange = _onChange;
 }
 
-void uiRadio::receiveFocus(uiElement* sender){
+void uiRadio::receiveFocus(uiElement* sender, bool isPreselection){
     UI_DEBUG("bounce focus",id)
-    sender->receiveFocus(this);
-    checked = !checked;
-    SafeCallback(onRcvFocus, onRcvFocus(this, UIEventType::UIET_onChange))
-    SafeCallback(groupParent, groupParent->updateRadioSelection(this, UIEventType::UIET_onChange))
+    sender->receiveFocus(this, isPreselection);
+    SafeCallback(onRcvFocus, onRcvFocus(this, UIEventType::UIET_onFocusBounce))
+    if(!isPreselection){
+        checked = !checked;
+        SafeCallback(onChange,onChange(this, UIEventType::UIET_onChange))
+        SafeCallback(groupParent, groupParent->updateRadioSelection(this, UIEventType::UIET_onChange))
+    }
 }
 
 void uiRadio::drawThis(frameInfo* f){

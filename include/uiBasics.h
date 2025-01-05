@@ -35,6 +35,7 @@ enum UIEventType{
     UIET_onSecondaryCustom3, //secondary custom3 was pressed
     UIET_onSecondaryCustom4, //secondary custom4 was pressed
     UIET_onChange, //the element has changed its state
+    UIET_onClick, //the element was clicked (or pressed)
 }; 
 
 String UIEventTypeToString(UIEventType et);

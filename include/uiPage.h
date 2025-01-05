@@ -20,8 +20,8 @@ class uiPage: public uiElement{
         ~uiPage(); //destructor
         void setRoot(uiRoot* _root);
         //void receiveFocus(uiElement* sender);
-        void receiveFocus(uiRoot* sender);
-        void receiveFocus(uiElement* sender) override;
+        void receiveFocus(uiRoot* sender, bool isPreselection);
+        void receiveFocus(uiElement* sender, bool isPreselection) override;
         uiClassHirachyType getUIClassHirachyType();
         //void react(UserAction ua);
         void resetFocusAndSelection(bool recursive = false); //resers focus and selection to the default values. This is used when the focus is shifted to another element.

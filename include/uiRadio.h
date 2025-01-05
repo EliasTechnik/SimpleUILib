@@ -17,14 +17,15 @@ class uiRadio: public uiSelectableCollection, public uiText, public uiCircle, pu
         bool checked = false;
         void drawThis(frameInfo* f) override;
         uiEventCallback onRcvFocus;
+        uiEventCallback onChange;
         uiRadioGroup* groupParent = nullptr;
     public:
-        uiRadio(Position _position, string _text, bool _checked, uiEventCallback _onRcvFocus = nullptr, Padding _padding = UI_DEFAULT_PADDING_2a);
+        uiRadio(Position _position, string _text, bool _checked, uiEventCallback _onChange = nullptr, uiEventCallback _onRcvFocus = nullptr, Padding _padding = UI_DEFAULT_PADDING_2a);
         void setOnRcvFocus(uiEventCallback _onRcvFocus);
         void setChecked(bool _checked);
         bool getChecked();
         void setGroupParent(uiRadioGroup* _groupParent);
-        void receiveFocus(uiElement* sender) override;
+        void receiveFocus(uiElement* sender, bool isPreselection) override;
 };
 
 class uiRadioGroup: public uiSelectGroup{

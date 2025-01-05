@@ -226,8 +226,10 @@ void uiHardwareInputDriver::switchInputInsertCallbackMode(uiHIDInputInsertCBMode
 }
 
 void uiHardwareInputDriver::blockLongpressUntilLifted(){
+    UI_DEBUG("Blocking any longpress until lifted","HID")
     for(uiHardwareButton* input : inputs){
         if(input->isLongpressing()){
+            UI_DEBUG("Longpress blocked.", "HID")
             input->satisfyLongpressRequest();
         }
     }
@@ -235,4 +237,5 @@ void uiHardwareInputDriver::blockLongpressUntilLifted(){
 
 void uiHardwareInputDriver::timeoutLongpress(unsigned long timeout){
     unlockLongpressAfter = millis()+timeout;
+    UI_DEBUG("Longpress timeout set","HID")
 }

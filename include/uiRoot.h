@@ -23,6 +23,7 @@ class uiRoot{
         unsigned long lastDisplayFlash = 0;
         ScreenState globalDisplayState = ScreenState::on;
         FocusState focus = FocusState::current;
+        bool isPageNavigationDeactivated = false;
         void init();
         void FlushDisplay(frameInfo* fi);
         void drawUI(frameInfo* fi);
@@ -50,6 +51,7 @@ class uiRoot{
         void removePage(uiPage* page);
         void printTree(HardwareSerial * s); //prints the ui tree to the given serial
         uiPage* getPageByID(String id);
+        void deactivatePageNavigation(bool deactivate);
         //uiClassHirachyType getUIClassHirachyType() override;
 };
 

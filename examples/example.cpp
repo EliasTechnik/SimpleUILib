@@ -155,6 +155,8 @@ void setupUI(){
   //DO NOT USE THIS FUNCTION IF YOUR SETUP TAKES LONGER THAN 20 SECONDS TO RUN!
 
   //create some groups to structure the UI. uiSelectGroups are used to group elements that can be selected.
+  //It is important to group elements that should be navigateable by the user in a select group. 
+  //This is necessary for the navigation logic to work because the page does not provide this logic.
   uiSelectGroup* mainGroup = new uiSelectGroup();
   mainGroup->setID("mainGroup"); //uiElements can be identified by their ID. This is usefull for debugging and for callbacks but not neccessary.
   uiSelectGroup* secGroup = new uiSelectGroup();
@@ -163,8 +165,8 @@ void setupUI(){
   secGroup->setID("thirdGroup");
 
   //add some ui elements to the Groups
-  //uiPassiveLabels are used to display text. They are passive and can not receive focus.
-  uiPassiveLabel * label = new uiPassiveLabel("Input Mode",Position(25,0)); //Position is used to set the position of the element in X and Y direction.
+  //uiLabels are used to display text. They are passive and can not receive focus.
+  uiLabel * label = new uiLabel("Input Mode",Position(25,0)); //Position is used to set the position of the element in X and Y direction.
   label->setID("label");
   mainGroup->addChild(
     label
@@ -196,7 +198,7 @@ void setupUI(){
 
   //if you dont need to access the element later you can add it directly to the group
   secGroup->addChild(
-    new uiPassiveLabel("Test",Position(32,0))
+    new uiLabel("Test",Position(32,0))
   );
 
   //checkboxes with labels are also supported
@@ -278,8 +280,8 @@ void setupUI(){
   //to show this of we crate a page with a full size image.
   uiPage* splashScreen = new uiPage(new uiImageContainer(0,0,128,64,logo_XBM));
 
-  //uiPages are the elements behind uiRoot. They can be used to create a pagination. Currently the are not stackable. 
-  //This means Pagination is only available on Root level.
+  //uiPages are the elements behind uiRoot. They can be used to create a pagination. Currently the are not stackable, nor do they provide logic to select between its children.
+  //This means Pagination is only available on Root level and for the most part behind every Page should be a uiSelectGroup.
   //on each page we add a priveous created group or uiElement.
   uiPage* page1 = new uiPage(mainGroup);
   page1->setID("page1");
