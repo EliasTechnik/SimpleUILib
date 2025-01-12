@@ -15,6 +15,7 @@ class uiBasicButton: public uiSelectableCollection, public uiText, public uiBox,
         uiEventCallback onRcvFocus;     //gets called every time the element receives focus
         uiEventCallback onUserPressed;  //gets called when the user presses the button
     public:
+        uiBasicButton();
         uiBasicButton(Position _position, string _text, uiEventCallback _onUserPressed, uiEventCallback _onRcvFocus = nullptr, Padding _padding = UI_DEFAULT_PADDING_2a);
         void receiveFocus(uiElement* sender, bool isPreselection) override;
 };
@@ -39,6 +40,17 @@ class uiIconButton: public uiSelectableCollection, public uiImage, public uiFram
     public:
         uiIconButton(Position _position, uiImage* _img, uiEventCallback _onUserPressed, uiEventCallback _onRcvFocus = nullptr, Padding _padding = UI_DEFAULT_PADDING_2a);
         void receiveFocus(uiElement* sender, bool isPreselection) override;
+};
+
+class uiToggleButton: public uiBasicButton {
+    protected:
+        bool state = false;
+        void drawThis(frameInfo* f) override;
+    public:
+        uiToggleButton();
+        uiToggleButton(Position _position, string _text, uiEventCallback _onUserPressed, bool _state = false, uiEventCallback _onRcvFocus = nullptr, Padding _padding = UI_DEFAULT_PADDING_2a);
+        void setToggleState(bool _state);
+        bool getState();
 };
 
 

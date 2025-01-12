@@ -5,6 +5,15 @@
                     uiBasicButton
 ##########################################################
 */
+
+uiBasicButton::uiBasicButton(){
+    visible = true;
+    id = "uiBasicButton";
+    selectionMode = SelectionMode::selectable;
+    focusMode = FocusMode::collection;
+    padding = UI_DEFAULT_PADDING_2a;
+}
+
 uiBasicButton::uiBasicButton(Position _position, string _text, uiEventCallback _onUserPressed, uiEventCallback _onRcvFocus, Padding _padding){
     visible = true;
     id = "uiBasicButton";
@@ -221,6 +230,98 @@ void uiIconButton::drawThis(frameInfo* f){
                     padding.getOuter(Dimension(position, imgSizing))
                 );
                 drawImage(
+                    f,
+                    uiVisualTransformation(false,false),
+                    position
+                );
+            }
+    }
+}
+
+
+/*
+##########################################################
+                    uiToggleButton
+##########################################################
+*/
+
+uiToggleButton::uiToggleButton(){
+    visible = true;
+    id = "uiToggleButton";
+    selectionMode = SelectionMode::selectable;
+    focusMode = FocusMode::collection;
+    padding = UI_DEFAULT_PADDING_2a;
+}
+
+uiToggleButton::uiToggleButton(Position _position, string _text, uiEventCallback _onUserPressed, bool _state, uiEventCallback _onRcvFocus, Padding _padding){
+    visible = true;
+    id = "uiToggleButton";
+    selectionMode = SelectionMode::selectable;
+    focusMode = FocusMode::collection;
+    padding = _padding;
+    position = _position;
+    text = _text;
+    onRcvFocus = _onRcvFocus;
+    onUserPressed = _onUserPressed;
+    state = _state;
+}
+
+void uiToggleButton::setToggleState(bool _state){
+    state = _state;
+}
+
+bool uiToggleButton::getState(){
+    return state;
+}
+
+void uiToggleButton::drawThis(frameInfo* f){
+    //UI_DEBUG("draw",id);
+    switch(selected){
+        case SelectionState::notSelected:
+            if(state){
+                drawBox(
+                    f,
+                    uiVisualTransformation(false,false),
+                    padding.getOuter(Dimension(position, getTextSizing(f)))
+                );
+                drawText(
+                    f,
+                    uiVisualTransformation(true,true),
+                    position
+                );
+            }else{
+                drawFrame(
+                    f,
+                    uiVisualTransformation(false,false),
+                    padding.getOuter(Dimension(position, getTextSizing(f)))
+                );
+                drawText(
+                    f,
+                    uiVisualTransformation(false,false),
+                    position
+                );
+            }
+        break;
+        default:
+            //UI_DEBUG()"draw selected",id);
+            if(f->highlightSelected){
+                drawBox(
+                    f,
+                    uiVisualTransformation(false,false),
+                    padding.getOuter(Dimension(position, getTextSizing(f)))
+                );
+                drawText(
+                    f,
+                    uiVisualTransformation(true,true),
+                    position
+                );
+            }else{
+                drawFrame(
+                    f,
+                    uiVisualTransformation(false,false),
+                    padding.getOuter(Dimension(position, getTextSizing(f)))
+                );
+                drawText(
                     f,
                     uiVisualTransformation(false,false),
                     position
