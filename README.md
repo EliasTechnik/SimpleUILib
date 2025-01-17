@@ -1,23 +1,21 @@
 # SimpleUI
 
-This project aims to provide a simple object oriented ui-system for small embedded screens.
+This project aims to provide a simple object oriented ui-system for small monochrome embedded screens. The main features of this framework are:
+
+- Easy setup: Build a customizable UI with few lines of code and with minimal logic.
+- Expandable: Need a component which isn't allready provided by the library? No problem. Almost all components are build upon the same base classes. Building a custom component which integrates into the framework is easy.
+- Streamline the setup: Because the UI is build during runtime it is easy to streamline the building process by grouping building steps and putting them in builde dunctions.
 
 ## Structure
 
-In object oriented fashion the framework has a hirachical structure and builds each component on one or more base classes.
+The library itself relies heavely on inheritance but his is only important to know if you wish to write your own components. During runtime the ui uses a tree structure as the backbone to funktion. In this tree, ui components have a parent component and might have multiple children components. In the folowing explanation this structure is called _UI-Tree_ and the parents and childs are called _uiElement_ or elements. 
 
-dimensions
-└── uiElement
-    ├── uiGroup
-    ├── uiPage
-    └── StaticLabel
-        └── uiInteractiveText
-uiInteractive
-└── uiInteractiveText
+**For component developers:**
+The ```uiElement``` is the base class for each component. It provides the necesarry logic to make the backbone of the uiTree work. It does not provide any positional or dimensional data. When writing custom components they have to inherit ```uiElement``` in order to work within the UI-Tree. See [Writing custom components](#Writing_custom_components) for more information.
 
 ## UI-Tree
 
-This is a sample structure for a posible ui-tree. It starts at the uiRoot object. The uiRoot receives all inputs and starts the drawing function. The base class uiElement can contain a pointer to a child and to a parent. uiGroup inherits from uiElement but does things differently. uiGroup does not contain a single child but multiple and can manage them. Because uiRoot doesnt inherit from uiElement there is a need of a glue object between uiRoot and uiElement. This is uiPage.
+This is a sample structure for a posible ui-tree. It starts at the uiRoot object. The uiRoot receives all inputs and starts the drawing function. It also provides a paging functionality.  uiGroup inherits from uiElement but does things differently. uiGroup does not contain a single child but multiple and can manage them. Because uiRoot doesnt inherit from uiElement there is a need of a glue object between uiRoot and uiElement. This is uiPage.
 
 When building an ui we only add child objects. This means each object only knows its child(s). The parent pointer is learned during runtime.
 
